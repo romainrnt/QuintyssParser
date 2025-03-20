@@ -13,6 +13,7 @@ import PhotoInsta7 from '../assets/photoInsta/photo-instagram-7@2x.png';
 import PhotoInsta8 from '../assets/photoInsta/photo-instagram-8@2x.png';
 import PhotoInsta9 from '../assets/photoInsta/photo-instagram-9@2x.png';
 
+// FooterSection
 const FooterInstagramGallery: FC = () => (
   <div className="flex flex-col gap-y-6 relative">
     <div className="grid grid-cols-3 gap-2 w-[232px] mx-auto">

@@ -4,6 +4,8 @@ import * as cheerio from "cheerio";
 import * as babel from "@babel/core";
 import * as babelParser from "@babel/parser";
 import traverse from "@babel/traverse";
+import generate from "@babel/generator";
+import * as t from "@babel/types";
 import { v4 as uuidv4 } from "uuid";
 import type { Element } from 'domhandler';
 import {
@@ -264,174 +266,194 @@ export async function processReactFile(
   try {
     const fileContent = fs.readFileSync(filePath, 'utf8');
 
+    // Parse the file
     const ast = babelParser.parse(fileContent, {
       sourceType: "module",
       plugins: ["jsx", "typescript"],
     });
 
+    // Track import changes
+    let hasImageImport = false;
+    let imageImportName = "Image";
+    let needsWidgetMediaImport = false;
+
+    // First pass - analyze imports
     traverse(ast, {
+      ImportDeclaration(path) {
+        const importPath = path.node.source.value;
+
+        // Check for Next.js Image import
+        if (importPath === "next/image") {
+          hasImageImport = true;
+
+          // Get the actual import name (could be different from "Image")
+          path.node.specifiers.forEach(specifier => {
+            if (specifier.type === "ImportDefaultSpecifier") {
+              imageImportName = specifier.local.name;
+            }
+          });
+
+          // Mark this import for removal
+          path.addComment("leading", "REMOVE_IMPORT");
+        }
+      },
+
+      // Check if we have Image components
       JSXElement(path) {
-        const element = path.node;
-        const jsxName = element.openingElement.name;
-
-        if (jsxName.type !== 'JSXIdentifier') {
-          return;
+        const elementName = path.node.openingElement.name;
+        if (elementName.type === "JSXIdentifier" && elementName.name === imageImportName) {
+          needsWidgetMediaImport = true;
         }
-
-        const componentName = jsxName.name;
-        let widgetType;
-
-        if (componentName.toLowerCase() in reactComponentToWidgetTypeMap) {
-          widgetType = reactComponentToWidgetTypeMap[componentName.toLowerCase()];
-        } else if (componentName.includes('Container') || componentName.includes('Section') || componentName.includes('Layout')) {
-          widgetType = 'WidgetContainer';
-        } else if (componentName.includes('Button') || componentName.includes('Link')) {
-          widgetType = 'WidgetAction';
-        } else if (componentName.includes('Image') || componentName.includes('Media')) {
-          widgetType = 'WidgetMedia';
-        } else if (componentName.includes('Text') || componentName.includes('Title') || componentName.includes('Heading')) {
-          widgetType = 'WidgetText';
-        } else if (componentName.includes('Input') || componentName.includes('Field')) {
-          widgetType = 'WidgetInput';
-        } else if (componentName.includes('Form')) {
-          widgetType = 'WidgetForm';
-        } else if (componentName.includes('List')) {
-          widgetType = 'WidgetList';
-        } else if (componentName.includes('Nav')) {
-          widgetType = 'WidgetNavigation';
-        } else {
-          widgetType = 'WidgetContainer';
-        }
-
-        const uniqueId = generateUniqueId(widgetType.toLowerCase().replace("widget", ""));
-
-        const props: Record<string, any> = {};
-
-        element.openingElement.attributes.forEach(attr => {
-          if (attr.type === 'JSXAttribute') {
-            const attrName = attr.name.name.toString();
-            let attrValue: any = '';
-
-            if (attr.value === null) {
-              attrValue = 'true';
-            } else if (attr.value && attr.value.type === 'StringLiteral') {
-              attrValue = attr.value.value;
-            } else if (attr.value && attr.value.type === 'JSXExpressionContainer') {
-              if (attr.value.expression.type === 'StringLiteral') {
-                attrValue = attr.value.expression.value;
-              } else if (attr.value.expression.type === 'BooleanLiteral') {
-                attrValue = attr.value.expression.value.toString();
-              } else if (attr.value.expression.type === 'NumericLiteral') {
-                attrValue = attr.value.expression.value.toString();
-              } else if (attr.value.expression.type === 'MemberExpression') {
-                attrValue = `expression`;
-              } else {
-                attrValue = `expression`;
-              }
-            }
-            if (attrName === 'className' || attrName === 'class') {
-              props.className = attrValue;
-            } else if (attrName === 'id') {
-              props.id = attrValue;
-            } else if (attrName === 'style') {
-            } else if (attrName === 'children') {
-            } else {
-              props[attrName] = attrValue;
-            }
-          }
-        });
-        switch (widgetType) {
-          case 'WidgetText':
-            props.tag = componentName.toLowerCase() === 'span' ? 'span' :
-                       (componentName.match(/h[1-6]/i) ? componentName.toLowerCase() : 'p');
-            props.type = componentName.toLowerCase() === 'span' ? 'inline' : 'heading';
-            let textContent = '';
-            if (element.children && element.children.length === 1 && element.children[0].type === 'JSXText') {
-              textContent = element.children[0].value.trim();
-            }
-
-            if (textContent) {
-              props.text = textContent;
-              translatableTexts[`text_${uniqueId}`] = textContent;
-            } else {
-              props.text = `[${componentName} Content]`;
-            }
-            break;
-
-          case 'WidgetAction':
-            props.tag = componentName.toLowerCase() === 'a' ? 'a' : 'button';
-            props.href = props.href || props.to || '#';
-            props.target = props.target || '_self';
-
-            let actionText = '';
-            if (element.children && element.children.length === 1 && element.children[0].type === 'JSXText') {
-              actionText = element.children[0].value.trim();
-            }
-
-            if (actionText) {
-              props.text = actionText;
-              translatableTexts[`action_${uniqueId}`] = actionText;
-            } else {
-              props.text = `[${componentName}]`;
-            }
-            break;
-
-          case 'WidgetMedia':
-            props.tag = 'img';
-            props.src = props.src || props.source || '';
-            props.alt = props.alt || '';
-            if (props.alt) {
-              translatableTexts[`media_alt_${uniqueId}`] = props.alt;
-            }
-            break;
-
-          case 'WidgetContainer':
-            props.tag = componentName.toLowerCase() in tagToWidgetTypeMap ?
-                       componentName.toLowerCase() : 'div';
-            break;
-
-          case 'WidgetInput':
-            props.tag = 'input';
-            props.type = props.type || 'text';
-            props.placeholder = props.placeholder || '';
-            if (props.placeholder) {
-              translatableTexts[`input_placeholder_${uniqueId}`] = props.placeholder;
-            }
-            props.name = props.name || '';
-            props.required = props.required || 'false';
-            break;
-
-          case 'WidgetForm':
-            props.tag = 'form';
-            props.action = props.action || props.onSubmit ? 'submit' : '';
-            props.method = props.method || 'post';
-            break;
-
-          case 'WidgetList':
-            props.tag = componentName.toLowerCase() === 'ol' ? 'ol' : 'ul';
-            props.type = componentName.toLowerCase() === 'ol' ? 'ordered' : 'unordered';
-            break;
-
-          case 'WidgetNavigation':
-            props.tag = 'nav';
-            break;
-        }
-
-        const jsonType = widgetTypeToJsonType[widgetType as keyof typeof widgetTypeToJsonType] || widgetType;
-        const widgetData: WidgetData = {
-          id: uniqueId,
-          type: jsonType,
-          props: props
-        };
-
-        pageWidgetCollection.push(widgetData);
-        stats[widgetType] = (stats[widgetType] || 0) + 1;
       }
     });
 
-    const outputFilePath = path.join(outputDir, `${pageSlug}.jsx`);
-    fs.writeFileSync(outputFilePath, fileContent);
-    console.log(`React traité : ${Object.entries(stats).map(([type, count]) => `${type}=${count}`).join(', ')}`);
+    // Second pass - transform Image components
+    traverse(ast, {
+      JSXElement(path) {
+        const element = path.node;
+        const elementName = element.openingElement.name;
+
+        if (elementName.type === "JSXIdentifier" && elementName.name === imageImportName) {
+          // Generate a media ID for this element
+          const mediaId = generateUniqueId('media');
+
+          // Extract alt text if present
+          let altText = "";
+          element.openingElement.attributes.forEach(attr => {
+            if (attr.type === "JSXAttribute" &&
+                attr.name.name === "alt" &&
+                attr.value && attr.value.type === "StringLiteral") {
+              altText = attr.value.value;
+            }
+          });
+
+          // Add alt text to translations if available
+          if (altText) {
+            const translationKey = `media_alt_${mediaId}`;
+            translatableTexts[translationKey] = altText;
+          }
+
+          // Build new attributes array
+          const newAttributes = [];
+
+          // Add modelId attribute
+          newAttributes.push(
+            t.jsxAttribute(
+              t.jsxIdentifier("modelId"),
+              t.stringLiteral(mediaId)
+            )
+          );
+
+          // Add alt attribute with translation key
+          if (altText) {
+            newAttributes.push(
+              t.jsxAttribute(
+                t.jsxIdentifier("alt"),
+                t.stringLiteral(`media_alt_${mediaId}`)
+              )
+            );
+          }
+
+          // Add global attribute for logos/static images
+          newAttributes.push(
+            t.jsxAttribute(
+              t.jsxIdentifier("global"),
+              null
+            )
+          );
+
+          // Copy className and other attributes
+          element.openingElement.attributes.forEach(attr => {
+            if (attr.type === "JSXAttribute") {
+              const name = attr.name.name;
+              // Include className but skip src and alt
+              if (name === "className") {
+                newAttributes.push(attr);
+              }
+            }
+          });
+
+          // Create the WidgetMedia element
+          const widgetElement = t.jsxElement(
+            t.jsxOpeningElement(
+              t.jsxIdentifier("WidgetMedia"),
+              newAttributes,
+              element.openingElement.selfClosing
+            ),
+            element.closingElement ?
+              t.jsxClosingElement(t.jsxIdentifier("WidgetMedia")) :
+              null,
+            [],
+            element.openingElement.selfClosing
+          );
+
+          // Replace original Image with WidgetMedia
+          path.replaceWith(widgetElement);
+
+          // Add widget to collection
+          const widgetData: WidgetData = {
+            id: mediaId,
+            type: "MediaWidget",
+            props: {
+              tag: "img",
+              alt: altText
+            }
+          };
+
+          // Add className if available
+          element.openingElement.attributes.forEach(attr => {
+            if (attr.type === "JSXAttribute" && attr.name.name === "className") {
+              if (attr.value && attr.value.type === "StringLiteral") {
+                widgetData.props.className = attr.value.value;
+              }
+            }
+          });
+
+          pageWidgetCollection.push(widgetData);
+          stats["WidgetMedia"] = (stats["WidgetMedia"] || 0) + 1;
+        }
+      }
+    });
+
+    // Third pass - update imports
+    traverse(ast, {
+      Program(path) {
+        // Add WidgetMedia import if needed
+        if (needsWidgetMediaImport) {
+          const widgetImport = t.importDeclaration(
+            [t.importDefaultSpecifier(t.identifier("WidgetMedia"))],
+            t.stringLiteral("@Widget/Media")
+          );
+
+          // Add it to the top
+          path.node.body.unshift(widgetImport);
+        }
+      },
+
+      // Remove Image import
+      ImportDeclaration(path) {
+        const comments = path.node.leadingComments || [];
+        if (comments.some(comment => comment.value.includes("REMOVE_IMPORT"))) {
+          path.remove();
+        }
+      }
+    });
+
+    // Generate the modified code
+    const output = generate(ast, {
+      retainLines: false,
+      concise: false,
+      jsescOption: {
+        quotes: "single"
+      }
+    });
+
+    // Write to TSX file (not JSX)
+    const outputFilePath = path.join(outputDir, `${pageSlug}.tsx`);
+    fs.writeFileSync(outputFilePath, output.code);
+
+    console.log(`   React traité : ${Object.entries(stats).map(([type, count]) => `${type}=${count}`).join(', ')}`);
+
     return pageWidgetCollection;
   } catch (error) {
     console.error(`❌ Erreur lors du traitement du fichier React ${filePath}:`, error);

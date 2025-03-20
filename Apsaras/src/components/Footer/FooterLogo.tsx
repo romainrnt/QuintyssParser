@@ -4,6 +4,7 @@ import Image from 'next/image';
 
 import ApsaraLogo from '../assets/logo-apsara-blanc.png';
 
+// FooterSection
 const FooterLogo: FC = () => (
   <div className="flex flex-col gap-y-6 lg:w-1/4">
     {/* Logo */}

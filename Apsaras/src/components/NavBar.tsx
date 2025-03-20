@@ -47,21 +47,16 @@ const NavBar: FC<IProps> = ({ toggleMenu, isOpen }) => {
         'transition-transform duration-300 lg:flex-row lg:items-center lg:justify-between'
       )}
     >
-      {/* WidgetContainer (closeButtonContainer) */}
       <div className="flex justify-end p-4 lg:hidden">
-        {/* WidgetAction (closeButton) */}
         <IoClose onClick={toggleMenu} className="text-apsara-text text-4xl cursor-pointer" />
       </div>
-      {/* WidgetContainer (navContainer) */}
       <div className="w-full flex flex-col items-center gap-y-6 lg:gap-0 lg:flex-row lg:justify-between lg:w-auto lg:px-4">
-        {/* WidgetAction (homeLink) */}
         <Link href="/" aria-label="Retour à l'accueil">
           <IoHomeOutline className="hidden lg:block absolute left-[47px] top-[50%] transform -translate-y-1/2 text-[23px] text-[#09252D] cursor-pointer" />
         </Link>
-        {/* WidgetNavigation (navLinks) */}
         <div className="flex flex-col items-center gap-y-8 lg:gap-y-0 lg:gap-x-[45px] lg:flex-row lg:ml-[100px] w-full px-6 lg:px-0 lg:py-4">
           {navItems.map(item => (
-            /* WidgetAction (navItem) */
+            /* WidgetNavigation (navItem) */
             <Link
               key={item.text}
               href={item.href}
@@ -75,7 +70,6 @@ const NavBar: FC<IProps> = ({ toggleMenu, isOpen }) => {
             </Link>
           ))}
         </div>
-        {/* WidgetContainer (languageSelector) */}
         <LanguageSelector
           isLangOpen={isLangOpen}
           toggleLang={toggleLang}

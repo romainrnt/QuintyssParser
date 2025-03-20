@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { SUPPORTED_LANGUAGES, TemplateStructure } from "./types";
+import { SUPPORTED_LANGUAGES, TemplateStructure, PageData, SectionGroup } from "./types";
 
 export function generateDatabaseQueries(
   templateStructure: TemplateStructure,
@@ -67,6 +67,11 @@ export function generateDatabaseQueries(
     sql += `        ),\n`;
     sql += `        'slug', '${page.slug}',\n`;
     sql += `        'layout', '${page.layout}',\n`;
+
+    // Ajouter la section si elle existe
+    if (page.section) {
+      sql += `        'section', '${page.section}',\n`;
+    }
 
     sql += `        'widgets', jsonb_build_array(\n`;
 
@@ -167,7 +172,7 @@ export function generateDatabaseQueries(
     sql += `    '${modelId}', -- model_identifier\n`;
     sql += `    '${page.name.replace(/'/g, "''")}', -- name\n`;
     sql += `    '${page.slug}', -- slug\n`;
-    sql += `    'Page ${page.name} du template', -- description\n`;
+    sql += `    'Page ${page.name}${page.section ? ' (' + page.section + ')' : ''} du template', -- description\n`;
     sql += `    ${isHomepage}, -- is_homepage\n`;
     sql += `    ${index} -- order_index\n`;
     sql += `  );\n\n`;
@@ -210,7 +215,7 @@ export function generateDatabaseQueries(
       sql += `    '${widgetUuid}', -- identifier\n`;
       sql += `    '${modelId}', -- model_identifier\n`;
       sql += `    'Widget ${widget.id}', -- name\n`;
-      sql += `    'Widget généré automatiquement pour ${page.name}', -- description\n`;
+      sql += `    'Widget généré automatiquement pour ${page.name}${page.section ? ' (' + page.section + ')' : ''}', -- description\n`;
       sql += `    '${widget.type}', -- widget_type\n`;
 
       sql += `    jsonb_build_object(\n`;
@@ -328,15 +333,50 @@ function slugify(text: string): string {
     .replace(/-+$/, '');
 }
 
-export function generateTemplateJson(pageResults: Record<string, any>): TemplateStructure {
-  const pagesCount = Object.keys(pageResults).length;
-  const title = pagesCount === 1 ?
-                `Template - ${Object.values(pageResults)[0].name}` :
-                `Template Multi-pages - ${new Date().toLocaleDateString()}`;
+export function generateTemplateJson(pageResults: Record<string, PageData>): TemplateStructure {
+  // Regrouper les pages par section
+  const sections: Record<string, PageData[]> = {};
+
+  // Parcourir toutes les pages
+  Object.values(pageResults).forEach(page => {
+    const section = page.section || 'UnsortedSection';
+
+    if (!sections[section]) {
+      sections[section] = [];
+    }
+
+    sections[section].push(page);
+  });
+
+  // Créer un titre basé sur les sections trouvées
+  const sectionNames = Object.keys(sections).filter(s => s !== 'UnsortedSection');
+  let title = "";
+
+  if (sectionNames.length === 0) {
+    title = `Template Multi-pages - ${new Date().toLocaleDateString()}`;
+  } else if (sectionNames.length === 1) {
+    title = `Template ${sectionNames[0]} - ${new Date().toLocaleDateString()}`;
+  } else {
+    // Créer un titre avec toutes les sections
+    title = `Template ${sectionNames.join('+')} - ${new Date().toLocaleDateString()}`;
+  }
+
+  // Trier les pages: d'abord les pages avec section, puis les pages sans section
+  const sortedPages: PageData[] = [];
+
+  // Ajouter les pages organisées par section
+  sectionNames.forEach(section => {
+    sortedPages.push(...sections[section]);
+  });
+
+  // Ajouter les pages sans section à la fin
+  if (sections['UnsortedSection']) {
+    sortedPages.push(...sections['UnsortedSection']);
+  }
 
   const templateStructure: TemplateStructure = {
     name: title,
-    structure: Object.values(pageResults),
+    structure: sortedPages,
     style: {
       theme: "light",
       colors: {

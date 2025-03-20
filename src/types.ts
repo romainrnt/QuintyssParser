@@ -9,6 +9,7 @@ export interface PageData {
   slug: string;
   layout: string;
   widgets: WidgetData[];
+  section?: string | null;  // Ajout de la propriété section
 }
 
 export interface TemplateStructure {
@@ -21,6 +22,11 @@ export interface TemplateStructure {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+export interface SectionGroup {
+  section: string;
+  pages: PageData[];
 }
 
 export const SUPPORTED_LANGUAGES = ["fr", "en", "de", "es", "it", "pt"];
