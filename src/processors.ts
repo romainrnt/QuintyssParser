@@ -448,7 +448,6 @@ export async function processReactFile(
       }
     });
 
-    // Write to TSX file (not JSX)
     const outputFilePath = path.join(outputDir, `${pageSlug}.tsx`);
     fs.writeFileSync(outputFilePath, output.code);
 
