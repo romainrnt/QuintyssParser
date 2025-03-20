@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="56" height="56" viewBox="0 0 56 56">
+  <defs>
+    <filter id="Tracé_2330" x="0" y="2.422" width="56" height="53.578" filterUnits="userSpaceOnUse">
+      <feOffset dy="4" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feFlood flood-color="#09252d" flood-opacity="0.4"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Tracé_2331" x="14.51" y="0" width="31.816" height="34.238" filterUnits="userSpaceOnUse">
+      <feOffset dy="4" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="5" result="blur-2"/>
+      <feFlood flood-color="#09252d" flood-opacity="0.4"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Tracé_2332" x="19.347" y="0" width="31.816" height="34.238" filterUnits="userSpaceOnUse">
+      <feOffset dy="4" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="5" result="blur-3"/>
+      <feFlood flood-color="#09252d" flood-opacity="0.4"/>
+      <feComposite operator="in" in2="blur-3"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Tracé_2333" x="9.673" y="0" width="31.816" height="34.238" filterUnits="userSpaceOnUse">
+      <feOffset dy="4" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="5" result="blur-4"/>
+      <feFlood flood-color="#09252d" flood-opacity="0.4"/>
+      <feComposite operator="in" in2="blur-4"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Tracé_2334" x="4.837" y="0" width="31.816" height="34.238" filterUnits="userSpaceOnUse">
+      <feOffset dy="4" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="5" result="blur-5"/>
+      <feFlood flood-color="#09252d" flood-opacity="0.4"/>
+      <feComposite operator="in" in2="blur-5"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Tracé_2335" x="0" y="8.464" width="52.367" height="31.816" filterUnits="userSpaceOnUse">
+      <feOffset dy="4" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="5" result="blur-6"/>
+      <feFlood flood-color="#09252d" flood-opacity="0.4"/>
+      <feComposite operator="in" in2="blur-6"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="icon-calendar-white" transform="translate(15 11)">
+    <g transform="matrix(1, 0, 0, 1, -15, -11)" filter="url(#Tracé_2330)">
+      <path id="Tracé_2330-2" data-name="Tracé 2330" d="M49.341,92.911H29.993a3.325,3.325,0,0,1-3.326-3.325V72.658a3.325,3.325,0,0,1,3.326-3.325H49.341a3.325,3.325,0,0,1,3.326,3.325V89.586A3.325,3.325,0,0,1,49.341,92.911ZM29.993,71.147a1.512,1.512,0,0,0-1.512,1.511V89.586A1.512,1.512,0,0,0,29.993,91.1H49.341a1.512,1.512,0,0,0,1.512-1.511V72.658a1.512,1.512,0,0,0-1.512-1.511Z" transform="translate(-11.67 -55.91)" fill="#fff"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, -15, -11)" filter="url(#Tracé_2331)">
+      <path id="Tracé_2331-2" data-name="Tracé 2331" d="M283.575,30.905a.92.92,0,0,1-.908-.908V27.575a.908.908,0,1,1,1.816,0V30A.92.92,0,0,1,283.575,30.905Z" transform="translate(-253.16 -15.67)" fill="#fff"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, -15, -11)" filter="url(#Tracé_2332)">
+      <path id="Tracé_2332-2" data-name="Tracé 2332" d="M368.908,30.905A.92.92,0,0,1,368,30V27.575a.908.908,0,0,1,1.816,0V30A.92.92,0,0,1,368.908,30.905Z" transform="translate(-333.65 -15.67)" fill="#fff"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, -15, -11)" filter="url(#Tracé_2333)">
+      <path id="Tracé_2333-2" data-name="Tracé 2333" d="M198.241,30.905a.92.92,0,0,1-.908-.908V27.575a.908.908,0,1,1,1.816,0V30A.92.92,0,0,1,198.241,30.905Z" transform="translate(-172.66 -15.67)" fill="#fff"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, -15, -11)" filter="url(#Tracé_2334)">
+      <path id="Tracé_2334-2" data-name="Tracé 2334" d="M112.908,30.905A.92.92,0,0,1,112,30V27.575a.908.908,0,1,1,1.816,0V30A.92.92,0,0,1,112.908,30.905Z" transform="translate(-92.16 -15.67)" fill="#fff"/>
+    </g>
+    <g transform="matrix(1, 0, 0, 1, -15, -11)" filter="url(#Tracé_2335)">
+      <path id="Tracé_2335-2" data-name="Tracé 2335" d="M48.127,177.816H27.574a.908.908,0,0,1,0-1.816H48.127a.908.908,0,0,1,0,1.816Z" transform="translate(-11.67 -156.54)" fill="#fff"/>
+    </g>
+    <g id="Groupe_1432" data-name="Groupe 1432" transform="translate(4.523 12.993)">
+      <circle id="Ellipse_8" data-name="Ellipse 8" cx="1.211" cy="1.211" r="1.211" transform="translate(0)" fill="#f9f9fc"/>
+      <circle id="Ellipse_9" data-name="Ellipse 9" cx="1.211" cy="1.211" r="1.211" transform="translate(4.844)" fill="#f9f9fc"/>
+      <circle id="Ellipse_10" data-name="Ellipse 10" cx="1.211" cy="1.211" r="1.211" transform="translate(9.688)" fill="#f9f9fc"/>
+      <circle id="Ellipse_11" data-name="Ellipse 11" cx="1.211" cy="1.211" r="1.211" transform="translate(14.531)" fill="#f9f9fc"/>
+      <circle id="Ellipse_12" data-name="Ellipse 12" cx="1.211" cy="1.211" r="1.211" transform="translate(0 4.844)" fill="#f9f9fc"/>
+      <circle id="Ellipse_13" data-name="Ellipse 13" cx="1.211" cy="1.211" r="1.211" transform="translate(4.844 4.844)" fill="#f9f9fc"/>
+      <circle id="Ellipse_14" data-name="Ellipse 14" cx="1.211" cy="1.211" r="1.211" transform="translate(9.688 4.844)" fill="#f9f9fc"/>
+      <circle id="Ellipse_15" data-name="Ellipse 15" cx="1.211" cy="1.211" r="1.211" transform="translate(14.531 4.844)" fill="#f9f9fc"/>
+    </g>
+  </g>
+</svg>
