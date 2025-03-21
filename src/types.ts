@@ -9,7 +9,7 @@ export interface PageData {
   slug: string;
   layout: string;
   widgets: WidgetData[];
-  section?: string | null;  // Ajout de la propriété section
+  section?: string | null;
 }
 
 export interface TemplateStructure {
@@ -39,14 +39,14 @@ export const tagToWidgetTypeMap: Record<string, string> = {
   "h4": "WidgetText",
   "h5": "WidgetText",
   "h6": "WidgetText",
-  "p": "WidgetEditor",
+  "p": "WidgetText",
   "div": "WidgetContainer",
   "section": "WidgetContainer",
   "article": "WidgetContainer",
   "header": "WidgetContainer",
   "footer": "WidgetContainer",
   "nav": "WidgetNavigation",
-  "button": "WidgetAction",
+  "button": "WidgetButton",
   "a": "WidgetAction",
   "img": "WidgetMedia",
   "form": "WidgetForm",
@@ -75,9 +75,9 @@ export const reactComponentToWidgetTypeMap: Record<string, string> = {
   "h4": "WidgetText",
   "h5": "WidgetText",
   "h6": "WidgetText",
-  "p": "WidgetEditor",
+  "p": "WidgetText",
   "span": "WidgetText",
-  "button": "WidgetAction",
+  "button": "WidgetButton",
   "a": "WidgetAction",
   "img": "WidgetMedia",
   "ul": "WidgetList",
@@ -88,12 +88,12 @@ export const reactComponentToWidgetTypeMap: Record<string, string> = {
   "Footer": "WidgetContainer",
   "Container": "WidgetContainer",
   "Card": "WidgetContainer",
-  "Button": "WidgetAction",
+  "Button": "WidgetButton",
   "Link": "WidgetAction",
   "Image": "WidgetMedia",
   "Text": "WidgetText",
   "Heading": "WidgetText",
-  "Paragraph": "WidgetEditor",
+  "Paragraph": "WidgetText",
   "Input": "WidgetInput",
   "Form": "WidgetForm",
   "List": "WidgetList",
@@ -108,6 +108,7 @@ export const widgetTypeToJsonType: Record<string, string> = {
   "WidgetContainer": "ContainerWidget",
   "WidgetNavigation": "NavigationWidget",
   "WidgetAction": "ActionWidget",
+  "WidgetButton": "ButtonWidget",
   "WidgetMedia": "MediaWidget",
   "WidgetForm": "FormWidget",
   "WidgetInput": "InputWidget",

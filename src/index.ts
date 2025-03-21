@@ -140,11 +140,15 @@ async function processAllFiles() {
         );
       }
 
-      let pageWidgets: WidgetData[] = [];
+      let pageData: { widgets: WidgetData[], section: string | null };
+
       if (fileExtension === '.html') {
-        pageWidgets = await processHtmlFile(filePath, pageSlug, outputDir);
+        pageData = await processHtmlFile(filePath, pageSlug, outputDir);
       } else if (fileExtension === '.tsx' || fileExtension === '.jsx') {
-        pageWidgets = await processReactFile(filePath, pageSlug, outputDir);
+        pageData = await processReactFile(filePath, pageSlug, outputDir);
+      } else {
+        console.log(`⚠️ Format de fichier non supporté: ${fileExtension}`);
+        continue;
       }
 
       // Mettre à jour ou créer la page
@@ -152,13 +156,14 @@ async function processAllFiles() {
         name: fileName,
         slug: pageSlug,
         layout: "default",
-        widgets: pageWidgets
+        widgets: pageData.widgets,
+        section: pageData.section
       };
 
-      console.log(`✅ ${relativePath} traité avec ${pageWidgets.length} widgets`);
+      console.log(`✅ ${relativePath} traité avec ${pageData.widgets.length} widgets ${pageData.section ? `(Section: ${pageData.section})` : ''}`);
 
       // Ajouter les widgets à la collection
-      widgetCollection.push(...pageWidgets);
+      widgetCollection.push(...pageData.widgets);
     }
 
     // Fusionner les nouvelles traductions avec les traductions existantes
@@ -200,11 +205,24 @@ async function processAllFiles() {
 
     console.log("\n🎉 Processus terminé avec succès !");
 
+    // Regrouper les pages par section pour afficher un résumé
+    const sectionCounts: Record<string, number> = {};
+    Object.values(pageResults).forEach(page => {
+      const section = page.section || 'Non classé';
+      sectionCounts[section] = (sectionCounts[section] || 0) + 1;
+    });
+
     console.log("\n📊 Résumé du traitement :");
     console.log(`   - Fichiers traités : ${allFiles.length}`);
     console.log(`   - Pages au total : ${Object.keys(pageResults).length}`);
     console.log(`   - Widgets au total : ${widgetCollection.length}`);
     console.log(`   - Textes traduits au total : ${Object.keys(mergedTranslations[SUPPORTED_LANGUAGES[0]]).length}`);
+    console.log(`   - Pages par section :`);
+
+    for (const [section, count] of Object.entries(sectionCounts)) {
+      console.log(`     • ${section}: ${count} page(s)`);
+    }
+
     console.log(`   - Langues supportées : ${SUPPORTED_LANGUAGES.join(', ')}`);
 
   } catch (err) {
